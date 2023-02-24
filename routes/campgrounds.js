@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+
 const catchAsync = require('../helpers/catchAsync');
 const ExpressError = require('../helpers/expressError');
+
 const Campground = require('../models/campground');
-const { validateCampground, validateReview } = require('../middleware/schema');
+const validateCampground = require('../middleware/schema');
 
 router.get(
   '/',
