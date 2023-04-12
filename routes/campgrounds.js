@@ -5,7 +5,7 @@ const catchAsync = require('../helpers/catchAsync');
 const ExpressError = require('../helpers/expressError');
 
 const Campground = require('../models/campground');
-const validateCampground = require('../middleware/schema');
+const { validateCampground } = require('../middleware/schema');
 
 router.get(
   '/',

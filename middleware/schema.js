@@ -11,6 +11,7 @@ const validationInfo = function (req, res, campgroundSchema, next) {
     throw new ExpressError(msg, 400);
   } else next();
 };
+
 //
 module.exports.validateCampground = catchAsync(async (req, res, next) => {
   const campgroundSchema = Joi.object({
@@ -41,4 +42,3 @@ module.exports.validateReview = catchAsync(async (req, res, next) => {
   });
   validationInfo(req, res, reviewSchema, next);
 });
-

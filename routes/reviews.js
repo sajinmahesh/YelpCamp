@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 const catchAsync = require('../helpers/catchAsync');
 const ExpressError = require('../helpers/expressError');
@@ -7,7 +7,7 @@ const ExpressError = require('../helpers/expressError');
 const Campground = require('../models/campground');
 const Review = require('../models/review');
 
-const validateReview = require('../middleware/schema');
+const { validateCampground, validateReview } = require('../middleware/schema');
 
 router.post(
   '/',
