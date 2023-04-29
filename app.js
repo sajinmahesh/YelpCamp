@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config;
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
@@ -24,15 +28,13 @@ const { validateCampground, validateReview } = require('./middleware/schema');
 const { setTimeout } = require('timers/promises');
 const campground = require('./models/campground');
 
-mongoose.connect(
-  'mongodb+srv://sajinm461:1234@mydatabase.pa6gsri.mongodb.net/yelp-camp',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true,
-  }
-);
+const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DB_PASSWORD);
+mongoose.connect(DB, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
@@ -50,6 +52,7 @@ const sessionConfig = {
   secret: 'thisshouldbeabettersecret',
   resave: false,
   saveUninitialized: true,
+
   cookie: {
     httpOnly: true,
     expires: Date.now() * 1000 * 60 * 60 * 24 * 7,
