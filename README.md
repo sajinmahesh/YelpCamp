@@ -1,6 +1,6 @@
 # YelpCamp
 
-U CAN VIEW THIS WEBSITE @ -  https://concerned-moccasins-duck.cyclic.app
+U CAN VIEW THIS WEBSITE @ -  https://campgroundsyelp.cyclic.app
 
 CREATED THIS WEBAPPLICATION TO IMPROVE MY SKILLS IN BACKEND DEVELOPMENT
 
