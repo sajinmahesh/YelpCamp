@@ -11,16 +11,18 @@ const validationInfo = function (req, res, campgroundSchema, next) {
     throw new ExpressError(msg, 400);
   } else next();
 };
+
 //
 module.exports.validateCampground = catchAsync(async (req, res, next) => {
   const campgroundSchema = Joi.object({
     campground: Joi.object({
       title: Joi.string().required(),
       price: Joi.number().required().min(0),
-      image: Joi.string().required(),
+      // image: Joi.string().required(),
       location: Joi.string().required(),
       description: Joi.string().required(),
     }).required(),
+    deleteImages: Joi.array(),
   });
   validationInfo(req, res, campgroundSchema, next);
   // const { error } = campgroundSchema.validate(req.body);
@@ -41,4 +43,3 @@ module.exports.validateReview = catchAsync(async (req, res, next) => {
   });
   validationInfo(req, res, reviewSchema, next);
 });
-
