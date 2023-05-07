@@ -1,84 +1,42 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const { storage } = require('../cloudinary');
+const upload = multer({ storage });
 
 const catchAsync = require('../helpers/catchAsync');
-
-const { isLoggedIn } = require('../middleware');
-const ExpressError = require('../helpers/expressError');
+const campgrounds = require('../controllers/campgrounds');
+const { isLoggedIn, isAuthor, isReviewAuthor } = require('../middleware');
 const Campground = require('../models/campground');
 const { validateCampground } = require('../middleware/schema');
+router
+  .route('/')
+  .get(catchAsync(campgrounds.index))
+  .post(
+    isLoggedIn,
+    upload.array('image'),
+    validateCampground,
+    catchAsync(campgrounds.createCampground)
+  );
 
-router.get(
-  '/',
-  catchAsync(async (req, res) => {
-    const campgrounds = await Campground.find({});
-    res.render('campgrounds/index', { campgrounds });
-  })
-);
-router.get('/new', isLoggedIn, (req, res) => {
-  res.render('campgrounds/new');
-});
-router.get(
-  '/:id',
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findById(id)
-      .populate('reviews')
-      .populate('author');
-    if (!campground) {
-      req.flash('error', 'campground not found');
-      return res.redirect('/campgrounds');
-    }
-    res.render('campgrounds/show', { campground });
-  })
-);
-router.post(
-  '/',
-  isLoggedIn,
-  validateCampground,
-  catchAsync(async (req, res, next) => {
-    const campground = new Campground(req.body.campground);
-    campground.author = req.user._id;
-    await campground.save();
-    req.flash('success', 'successfully created a new campground');
-    res.status(200).redirect(`/campgrounds/${campground._id}`);
-  })
-);
+router.get('/new', isLoggedIn, campgrounds.renderNewForm);
+router
+  .route('/:id')
+  .get(catchAsync(campgrounds.showCampground))
+  .put(
+    isLoggedIn,
+    isAuthor,
+    upload.array('image'),
+    validateCampground,
+    catchAsync(campgrounds.updateCampground)
+  )
+  .delete(isLoggedIn, isAuthor, catchAsync(campgrounds.deleteCampground));
+
 router.get(
   '/:id/edit',
   isLoggedIn,
-  catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const campground = await Campground.findById(id);
-    if (!campground) {
-      req.flash('error', 'campground not found');
-      return res.redirect('/campgrounds');
-    }
-    res.render('campgrounds/edit', { campground });
-  })
-);
-router.put(
-  '/:id',
-  isLoggedIn,
-  validateCampground,
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, {
-      ...req.body.campground,
-    });
-    req.flash('success', 'campground updated successfully');
-    res.redirect(`/campgrounds/${campground._id}`);
-  })
+  isAuthor,
+  catchAsync(campgrounds.renderEditForm)
 );
 
-router.delete(
-  '/:id',
-  isLoggedIn,
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findByIdAndDelete(id);
-    req.flash('success', 'successfully deleted campround');
-    res.redirect('/campgrounds');
-  })
-);
 module.exports = router;

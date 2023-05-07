@@ -1,8 +1,9 @@
 if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config({ path: './.env' });
+  require('dotenv').config();
 }
 
 const express = require('express');
+const app = express();
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const ejsMate = require('ejs-mate');
@@ -12,8 +13,8 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 const cookieParser = require('cookie-parser');
+const MongoStore = require('connect-mongo')(session);
 
-const app = express();
 const path = require('path');
 const Campground = require('./models/campground');
 const Review = require('./models/review');
@@ -48,8 +49,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+const secret = process.env.SECRET || 'thisshouldbeabettersecret';
+const store = new MongoStore({
+  url: DB,
+  secret,
+  touchAfter: 24 * 60 * 60,
+});
+store.on('error', function (e) {
+  console.log('session store error', e);
+});
+
 const sessionConfig = {
-  secret: 'thisshouldbeabettersecret',
+  store,
+  name: 'session',
+  secret,
   resave: false,
   saveUninitialized: true,
 
